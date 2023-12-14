@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Tarefas</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <div class="todo">
+      <h1 class="todo__title">Lista de Tarefas</h1>
+      <form class="todo__form" data-js="form-add">
+        <input class="todo__input" id="input" type="text" placeholder="Adicione uma tarefa"> 
+        <button class="todo__btn-add" type="submit">Add</button>
+      </form>
+      <div class="todo__list" data-js="todo-list">
+        <img src="todo_img.svg" data-js="todo-img" alt="Imagem de uma ToDo List">
+        <button class="todo__btn-deleteAll hidden" type="button" data-js="btn-deleteAll">Deletar Todas</button>
+      </div>
+  </div>
+</body>
+</html>

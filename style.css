@@ -1,0 +1,138 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
+/* 
+  #5C5B3E
+  #5F4586
+  #DBD428
+  #9C9943
+  #7027DB
+*/
+
+* {
+  padding: 0;
+  border: none;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #34224e;
+  color: white;
+  font-family: 'Roboto', sans-serif;
+}
+
+.todo {
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.todo__title {
+  color: #DBD428;
+  font-weight: 900;
+  text-align: center;
+}
+
+.todo__form {
+  display: flex;
+  
+  height: 50px;
+  margin: 30px 0;
+  margin-bottom: 60px;
+}
+
+.todo__input {
+  padding: 0 80px 0 20px;
+  border-radius: 10px;
+  background-color: #5C5B3E;
+  width: 100%;
+  color: white;
+  font-size: 16px;
+}
+
+.todo__btn-add {
+  width: 80px;
+  border-radius: 0 10px 10px 0;
+  margin-left: -80px;
+  background-color: #9C9943;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+
+  transition: all 400ms ease;
+}
+
+.todo__btn-add:hover {
+  background-color: #7027DB;
+}
+
+.todo__list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.todo__list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-radius: 10px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.todo__list-item.concluded {
+  background-color: #1e1f2e;
+  opacity: .4;
+}
+.todo__list-item.concluded span {
+  border: none;
+  text-decoration: line-through;
+}
+
+.todo__list-item span {
+  padding-left: 20px;
+  line-height: 40px;
+  height: 100%;
+  border-bottom: 2px solid #363b65;
+  width: 80%;
+}
+
+.todo__btn-delete {
+  border-radius: 0 10px 10px 0;
+  background-color: #9C9943;
+  height: 100%;
+  width: 80px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+
+  transition: all 400ms ease;
+}
+
+.todo__btn-delete:hover {
+  background-color: #db2727;
+}
+
+.todo__btn-deleteAll {
+  padding: 15px;
+  border: 2px solid #db2727;
+  border-radius: 10px;
+  margin-top: 40px;
+  background: none;
+  cursor: pointer;
+  color: #db2727;
+  font-size: 16px;
+
+  transition: all 400ms ease;
+}
+
+.todo__btn-deleteAll:hover {
+  background-color: #db2727;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
