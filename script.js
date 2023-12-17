@@ -3,7 +3,7 @@ const todoList = document.querySelector('[data-js="todo-list"]')
 const todoImg = document.querySelector('[data-js="todo-img"]')
 const btnDeleteAll = document.querySelector('[data-js="btn-deleteAll"]')
 
-let tasksLocalStorage = JSON.parse(localStorage.getItem('Tasks')) || []
+let currentListOfTasks = JSON.parse(localStorage.getItem('Tasks')) || []
 
 const resetForm = () => {
   formAddTodo.reset() 
@@ -11,9 +11,7 @@ const resetForm = () => {
 }
 
 const showOrHiddenTodoImg = () => {
-  const tasks = Array.from(document.querySelectorAll('[data-item="todo-item"]'))
-
-  if (tasks.length) {
+  if (currentListOfTasks.length) {
     todoImg.classList.add('hidden')
     return
   }
@@ -22,9 +20,7 @@ const showOrHiddenTodoImg = () => {
 }
 
 const showOrHiddenBtnDeleteAll = () => {
-  const tasks = Array.from(document.querySelectorAll('[data-item="todo-item"]'))
-
-  if (tasks.length > 1) {
+  if (currentListOfTasks.length > 1) {
     btnDeleteAll.classList.remove('hidden')
     return
   }
@@ -32,130 +28,114 @@ const showOrHiddenBtnDeleteAll = () => {
   btnDeleteAll.classList.add('hidden')
 }
 
-const showTasksLocalStorage = () => {
-  const tasksLocalStorageForShow = tasksLocalStorage
-  tasksLocalStorage = []
-  tasksLocalStorageForShow.forEach((task) => addTodo(task))
-}
-
-const addTaskLocalStorage = ({ text, isConcluded }) => {
-  tasksLocalStorage.push({ text, isConcluded })
-
-  localStorage.setItem('Tasks', JSON.stringify(tasksLocalStorage))
-}
-
-const removeTaskLocalStorage = task => {
-  tasksLocalStorage = tasksLocalStorage.filter(item => item.text !== task)
- 
-  localStorage.setItem('Tasks', JSON.stringify(tasksLocalStorage))
-}
-
-const removeAllTasksLocalStorage = () => {
-  tasksLocalStorage.splice(0)
-  localStorage.setItem('Tasks', JSON.stringify(tasksLocalStorage))
-}
-
-const modifyValueOfPropertyIsConcluded = (task, newValue) => {
-  const createNewArrWithModifiedPropertyValue = ({ text, isConcluded }) => {
-    if (text === task) {
-      return { text, isConcluded: newValue }
-    }
-
-    return { text, isConcluded }
-  }
+const addTaskInTheListTasks = task => {
+  const thisTaskAlreadyExists = currentListOfTasks.some(item => item.task === task)
   
-  const newTasksLocalStorage = tasksLocalStorage
-    .map(createNewArrWithModifiedPropertyValue)
-
-  tasksLocalStorage = newTasksLocalStorage
-  localStorage.setItem('Tasks', JSON.stringify(tasksLocalStorage))
-}
-
-const addTodo = ({ text, isConcluded }) => {
-  const thisTaskAlreadyExists = tasksLocalStorage.some(item => item.text === text)
-
   if (thisTaskAlreadyExists) {
     alert('Esta tarefa já existe na sua lista.')
     return
   }
+  currentListOfTasks.push({ task, isConcluded: false })
+}
 
-  const hasTheConcludedClass = isConcluded && 'concluded'
+const removeTaskOfTheListTasks = clickedElement => {
+  const taskToRemoved = clickedElement.dataset.trash
+
+  if (taskToRemoved === 'deleteAll') {
+    currentListOfTasks = []
+    return
+  }
   
-  if (text) {
+  if (taskToRemoved) {
+    const index = currentListOfTasks.indexOf(taskToRemoved)
+    currentListOfTasks.splice(index, 1)
+  }
+}
+
+const renderTasks = () => {
+  const taskItensInsiderDOM = document.querySelectorAll('[data-item="todo-item"]')
+  if (taskItensInsiderDOM) taskItensInsiderDOM.forEach(item => item.remove())
+   
+  currentListOfTasks.forEach(({ task, isConcluded }) => {
+    const hasClassConcluded = isConcluded ? 'concluded' : ''
+    
     const taskTemplateHTML = 
-    `<div class="todo__list-item ${hasTheConcludedClass}" data-item="todo-item" data-todo="${text}">
-      <span data-text="${text}">${text}</span>
-      <button class="todo__btn-delete" type="button" data-trash="${text}">Deletar</button>
-    </div>`
+      `<div class="todo__list-item ${hasClassConcluded}" data-item="todo-item" data-todo="${task}">
+        <span data-text="${task}">${task}</span>
+        <button class="todo__btn-delete" type="button" data-trash="${task}">Deletar</button>
+      </div>`
 
     todoList.insertAdjacentHTML('afterbegin', taskTemplateHTML)
+  })
+}
 
-    addTaskLocalStorage({ text, isConcluded })
+const updateElementsTodo = () => {
+  renderTasks()
+  showOrHiddenTodoImg()
+  showOrHiddenBtnDeleteAll()
+}
+
+const updateLocalStorage = () => {
+  localStorage.setItem('Tasks', JSON.stringify(currentListOfTasks))
+
+  if (!currentListOfTasks.length) {
+    localStorage.removeItem('Tasks')
   }
 }
 
-const removeTodo = clickedElement => {
-  const trashDataValue = clickedElement.dataset.trash
-  const todo = document.querySelector(`[data-todo="${trashDataValue}"]`)
-
-  if (trashDataValue) {
-    todo.remove()
-
-    removeTaskLocalStorage(trashDataValue)
-  }
-}
-
-const concludeTodo = event => {
-  const clickedElement = event.target
+const concludeTask = ({ target }) => {
+  const clickedElement = target
   const dataValue = clickedElement.dataset.todo || clickedElement.dataset.text
-  const todo = document.querySelector(`[data-todo="${dataValue}"]`)
 
   if (dataValue) {
-    todo.classList.toggle('concluded')
+    const newCurrentListOfTasks = currentListOfTasks.map(({ task, isConcluded }) => {
+      if (task === dataValue) {
+        return { task, isConcluded: !isConcluded }
+      }
 
-    const includesConcludedClass = todo.classList.value.includes('concluded')
+      return { task, isConcluded }
+    })
 
-    if (includesConcludedClass) {
-      modifyValueOfPropertyIsConcluded(dataValue, true)
-    }
-    else {
-      modifyValueOfPropertyIsConcluded(dataValue, false)
-    }
+    currentListOfTasks = newCurrentListOfTasks
+
+    updateElementsTodo()
+    updateLocalStorage()
   }
 }
-
-const removeAllTodo = () => {
-  const tasks = document.querySelectorAll('[data-item="todo-item"]')
-
-  tasks.forEach(task => task.remove())
-  removeAllTasksLocalStorage()
-} 
 
 const handleFormAddTodoSubmit = event => {
   event.preventDefault()
 
   const inputValue = formAddTodo.input.value.trim()
 
-  addTodo({ text: inputValue, isConcluded: false })
-  showOrHiddenTodoImg()
-  showOrHiddenBtnDeleteAll()
+  if (inputValue) {
+    const lengthListBeforeRemovingTheTask = currentListOfTasks.length
+    
+    addTaskInTheListTasks(inputValue)
+
+    if (lengthListBeforeRemovingTheTask !== currentListOfTasks.length) {
+      updateElementsTodo()
+      updateLocalStorage()
+    }
+  }
   resetForm()
 }
 
-const handleTodoListClick = event => {
-  const clickedElement = event.target
+const handleTodoListClick = ({ target }) => {
+  const clickedElement = target
   
-  removeTodo(clickedElement)
-  showOrHiddenTodoImg()
-  showOrHiddenBtnDeleteAll()
+  const lengthListBeforeRemovingTheTask = currentListOfTasks.length
+
+  removeTaskOfTheListTasks(clickedElement)
+  
+  if (lengthListBeforeRemovingTheTask !== currentListOfTasks.length) {
+    updateElementsTodo()
+    updateLocalStorage()
+  }
 }
 
 formAddTodo.addEventListener('submit', handleFormAddTodoSubmit)
 todoList.addEventListener('click', handleTodoListClick)
-todoList.addEventListener('dblclick', concludeTodo)
-btnDeleteAll.addEventListener('click', removeAllTodo)
+todoList.addEventListener('dblclick', concludeTask)
 
-showTasksLocalStorage()
-showOrHiddenTodoImg()
-showOrHiddenBtnDeleteAll()
-// localStorage.clear()
+updateElementsTodo()
